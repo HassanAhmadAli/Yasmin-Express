@@ -1,0 +1,24 @@
+{
+  "watch": ["src"],
+  "ext": "js,json,ts,tsx,jsx,html,css",
+  "restartDelay": 1000,
+  "verbose": true,
+  "ignore": [
+    "**/node_modules/**",
+    "**/out/**",
+    "**/dist/**",
+    "**/build/**",
+    "**/.git/**",
+    "**/.vscode/**",
+    "**/.idea/**",
+    "**/.history/**",
+    "**/.cache/**",
+    "**/.next/**",
+    "**/.nuxt/**",
+    "**/.vercel/**",
+    "**/.output/**",
+    "**/.turbo/**",
+    "**/.vscode/**",
+    "**/static/**"
+  ]
+}
