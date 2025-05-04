@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import { AppError } from "../utils/errors.js";
 import _ from "lodash";
+
 const app: Router = express.Router();
 
 app.post("/", async (req: Request, res: Response, next: NextFunction) => {
@@ -21,7 +22,6 @@ app.post("/", async (req: Request, res: Response, next: NextFunction) => {
       return next(new AppError("User already exists", 409));
     }
 
-    // Hash password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(req.body.password, salt);
 
@@ -31,10 +31,8 @@ app.post("/", async (req: Request, res: Response, next: NextFunction) => {
     });
 
     const newUser = await user.save();
-
-    // Use lodash pick to select specific fields
-    const userResponse = _.pick(newUser, ["name", "email", "_id"]);
-    res.status(201).json(userResponse);
+    const token = newUser.getJsonWebToken();
+    res.header("x-auth-token", token).status(201).json({ token: token });
   } catch (error: any) {
     next(new AppError(error.message, 500));
   }

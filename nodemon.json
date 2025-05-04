@@ -1,11 +1,10 @@
 {
   "watch": ["src"],
   "ext": "js,json,ts,tsx,jsx,html,css",
-  "restartDelay": 1000,
   "verbose": true,
+  "delay": 300,
   "ignore": [
     "**/node_modules/**",
-    "**/out/**",
     "**/dist/**",
     "**/build/**",
     "**/.git/**",

@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node out/app.js",
-    "build": "tsc",
+    "build": "npx tsc",
     "dev": "nodemon out/app.js"
   },
   "repository": {
@@ -23,9 +23,11 @@
   "homepage": "https://github.com/HassanAhmadAli/CFY#readme",
   "devDependencies": {
     "@eslint/js": "^9.26.0",
+    "@types/config": "^3.3.5",
     "@types/dotenv": "^6.1.1",
     "@types/express": "^5.0.1",
     "@types/joi": "^17.2.2",
+    "@types/jsonwebtoken": "^9.0.9",
     "@types/lodash": "^4.17.16",
     "@types/mongoose": "^5.11.96",
     "eslint": "^9.26.0",
@@ -39,13 +41,23 @@
   },
   "dependencies": {
     "@types/bcrypt": "^5.0.2",
+    "@types/cookie-parser": "^1.4.8",
+    "@types/csurf": "^1.11.5",
+    "@types/express-session": "^1.18.1",
     "@types/joi-password-complexity": "^3.1.0",
+    "@types/logger": "^0.0.5",
     "bcrypt": "^5.1.1",
+    "body-parser": "^2.2.0",
     "config": "^3.3.12",
+    "connect-mongodb-session": "^5.0.0",
+    "cookie-parser": "^1.4.7",
+    "csurf": "^1.10.0",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
+    "express-session": "^1.18.1",
     "joi": "^17.13.3",
     "joi-password-complexity": "^5.2.0",
+    "jsonwebtoken": "^9.0.2",
     "lodash": "^4.17.21",
     "logger": "^0.0.1",
     "mongoose": "^8.14.1"
