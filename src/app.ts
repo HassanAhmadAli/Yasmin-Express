@@ -11,9 +11,10 @@ import publicRouter from "./routes/public.js";
 import cookieParser from "cookie-parser";
 import session from "express-session";
 import bodyParser from "body-parser";
+import morgan from "morgan";
 console.log(rootDir);
 const app = express();
-
+app.use(morgan("tiny"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());

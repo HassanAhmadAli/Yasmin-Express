@@ -46,6 +46,7 @@
     "@types/express-session": "^1.18.1",
     "@types/joi-password-complexity": "^3.1.0",
     "@types/logger": "^0.0.5",
+    "@types/morgan": "^1.9.9",
     "bcrypt": "^5.1.1",
     "body-parser": "^2.2.0",
     "config": "^3.3.12",
@@ -60,6 +61,7 @@
     "jsonwebtoken": "^9.0.2",
     "lodash": "^4.17.21",
     "logger": "^0.0.1",
-    "mongoose": "^8.14.1"
+    "mongoose": "^8.14.1",
+    "morgan": "^1.10.0"
   }
 }
