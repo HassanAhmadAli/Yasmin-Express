@@ -12,14 +12,16 @@ import cookieParser from "cookie-parser";
 import session from "express-session";
 import bodyParser from "body-parser";
 import morgan from "morgan";
-console.log(rootDir);
+
 const app = express();
+app.use(async (req, res, next) => {
+  setTimeout(next, 1000);
+});
 app.use(morgan("tiny"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: false }));
-// Add session middleware
 app.use(
   session({
     secret: env.jwtPrivateKey || "your-secret-key",

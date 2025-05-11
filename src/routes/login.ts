@@ -11,20 +11,18 @@ import env from "../utils/env.js";
 import csurf from "csurf";
 const authRoutes = express.Router();
 
-
 const csrf = csurf({
   ignoreMethods: ["POST"],
-  
   cookie: {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
   },
 });
 const schema = Joi.object({
-  name: Joi.string().min(5).max(50).required(),
   email: Joi.string().min(5).max(255).email().required(),
   password: password_validator,
   createdAt: Joi.date().optional(),
+  name: Joi.string().min(5).max(50).required(),
 });
 
 export const validate = (user: any) => {
