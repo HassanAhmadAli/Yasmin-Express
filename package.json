@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node out/app.js",
     "build": "npx tsc",
-    "dev": "tsc-watch --onSuccess \"node out/app.js\""
+    "dev": "npx tsc-watch --onSuccess \"node out/app.js\""
   },
   "repository": {
     "type": "git",
