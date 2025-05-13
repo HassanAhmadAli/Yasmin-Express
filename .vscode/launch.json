@@ -5,18 +5,11 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "console": "integratedTerminal",
-            "internalConsoleOptions": "neverOpen",
-            "name": "nodemon",
-            "program": "${workspaceFolder}/out/app.js",
+            "type": "node-terminal",
+            "name": "Run Script: dev",
             "request": "launch",
-            "restart": true,
-            "runtimeExecutable": "nodemon",
-            "args": [],
-            "skipFiles": [
-                "<node_internals>/**"
-            ],
-            "type": "node"
+            "command": "npm run dev",
+            "cwd": "${workspaceFolder}"
         }
     ]
 }
