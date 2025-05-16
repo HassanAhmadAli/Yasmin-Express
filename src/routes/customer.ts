@@ -1,11 +1,12 @@
 import express, { Request, Response, Router, NextFunction } from "express";
-import Welcome, { validateWelcome } from "../models/welcome.js";
+import Customer, { validateWelcome } from "../models/customer.js";
 import { AppError } from "../utils/errors.js";
+import { parsePhoneNumberFromString, PhoneNumber } from "libphonenumber-js";
 import authMiddleware from "../middleware/auth.js";
 
 const router: Router = express.Router();
 
-// Create new welcome
+// Create new customer
 router.post(
   "/",
   authMiddleware,
@@ -16,15 +17,24 @@ router.post(
         return next(new AppError(error.message, 400));
       }
 
-      const existingWelcome = await Welcome.findOne({
+      const existingWelcome = await Customer.findOne({
         username: req.body.username,
       });
       if (existingWelcome) {
         return next(new AppError("Username already exists", 409));
       }
+      try {
+        const phoneNumber = parsePhoneNumberFromString(
+          req.body.phone,
+          "US"
+        ) as PhoneNumber;
+        req.body.phone = phoneNumber.format("E.164");
+      } catch (error: any) {
+        next(new AppError(error.message, 500));
+      }
 
-      const welcome = new Welcome(req.body);
-      const result = await welcome.save();
+      const customer = new Customer(req.body);
+      const result = await customer.save();
       res.status(201).json(result);
     } catch (error: any) {
       next(new AppError(error.message, 500));
@@ -32,30 +42,44 @@ router.post(
   }
 );
 
-// Get all welcomes
+// Get all customer
 router.get("/", async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const welcomes = await Welcome.find();
-    res.json(welcomes);
+    const customers = await Customer.find();
+    res.json(customers);
   } catch (error: any) {
     next(new AppError(error.message, 500));
   }
 });
+router.get(
+  "/page/:number",
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const number: any = req.params.number;
+      const customers = await Customer.find()
+        .skip((number - 1) * 7)
+        .limit(7);
+      res.json(customers);
+    } catch (error: any) {
+      next(new AppError(error.message, 500));
+    }
+  }
+);
 
-// Get welcome by id
+// Get customer by id
 router.get("/:id", async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const welcome = await Welcome.findOne({ id: req.params.id });
-    if (!welcome) {
+    const customer = await Customer.findOne({ id: req.params.id });
+    if (!customer) {
       return next(new AppError("Welcome not found", 404));
     }
-    res.json(welcome);
+    res.json(customer);
   } catch (error: any) {
     next(new AppError(error.message, 500));
   }
 });
 
-// Update welcome
+// Update customer
 router.put(
   "/:id",
   authMiddleware,
@@ -66,31 +90,31 @@ router.put(
         return next(new AppError(error.message, 400));
       }
 
-      const welcome = await Welcome.findOneAndUpdate(
+      const customer = await Customer.findOneAndUpdate(
         { id: req.params.id },
         req.body,
         { new: true, runValidators: true }
       );
 
-      if (!welcome) {
+      if (!customer) {
         return next(new AppError("Welcome not found", 404));
       }
 
-      res.json(welcome);
+      res.json(customer);
     } catch (error: any) {
       next(new AppError(error.message, 500));
     }
   }
 );
 
-// Delete welcome
+// Delete customer
 router.delete(
   "/:id",
   authMiddleware,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const welcome = await Welcome.findOneAndDelete({ id: req.params.id });
-      if (!welcome) {
+      const customer = await Customer.findOneAndDelete({ id: req.params.id });
+      if (!customer) {
         return next(new AppError("Welcome not found", 404));
       }
       res.status(204).send();

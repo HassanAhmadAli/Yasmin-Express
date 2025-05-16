@@ -59,6 +59,7 @@
     "joi": "^17.13.3",
     "joi-password-complexity": "^5.2.0",
     "jsonwebtoken": "^9.0.2",
+    "libphonenumber-js": "^1.12.8",
     "lodash": "^4.17.21",
     "logger": "^0.0.1",
     "mongoose": "^8.14.1",
