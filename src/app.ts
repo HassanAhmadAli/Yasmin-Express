@@ -7,6 +7,7 @@ import errorHandler from "./middleware/errorHandler.js";
 import authMiddleware from "./middleware/auth.js";
 import authRoutes from "./routes/login.js";
 import customerRoutes from "./routes/customer.js";
+import productRoutes from "./routes/product.js";
 import env from "./utils/env.js";
 import publicRouter from "./routes/public.js";
 import cookieParser from "cookie-parser";
@@ -38,6 +39,7 @@ app.use(
 app.use("/api/signup", signupRoute);
 app.use("/api/login", authRoutes);
 app.use("/api/customer", customerRoutes);
+app.use("/api/products", productRoutes);
 app.use("/public", publicRouter);
 app.use(
   (req: express.Request, res: express.Response, next: express.NextFunction) => {

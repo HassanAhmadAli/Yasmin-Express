@@ -9,25 +9,15 @@ import password_validator from "../utils/password_validator.js";
 import jsonwebtoken from "jsonwebtoken";
 import env from "../utils/env.js";
 import csurf from "csurf";
+import { validateLoginUser } from "../models/user.js";
 const authRoutes = express.Router();
-
 const csrf = csurf({
-  ignoreMethods: ["POST"],
+  ignoreMethods: ["POST", "OPTIONS"],
   cookie: {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
   },
 });
-const schema = Joi.object({
-  email: Joi.string().min(5).max(255).email().required(),
-  password: password_validator,
-  createdAt: Joi.date().optional(),
-  name: Joi.string().min(5).max(50).required(),
-});
-
-export const validate = (user: any) => {
-  return schema.validate(user);
-};
 authRoutes.use(csrf);
 authRoutes.post(
   "/",
@@ -35,7 +25,7 @@ authRoutes.post(
     const invalidLoginMessage = "Invalid Email Or Password";
     try {
       // Validate input
-      const { error } = validate(req.body);
+      const { error } = validateLoginUser(req.body);
       if (error) {
         return next(new AppError(error.message, 400));
       }

@@ -31,16 +31,26 @@ userSchema.methods.getJsonWebToken = function (): string {
 };
 
 const User = mongoose.model<IUser>("User", userSchema);
+////
+const loginUserSchema = Joi.object({
+  email: Joi.string().min(5).max(255).email().required(),
+  password: password_validator,
+  createdAt: Joi.date().optional(),
+});
 
-const schema = Joi.object({
+export const validateLoginUser = (user: any) => {
+  return loginUserSchema.validate(user);
+};
+////
+const signupUserSchema = Joi.object({
   name: Joi.string().min(5).max(50).required(),
   email: Joi.string().min(5).max(255).email().required(),
   password: password_validator,
   createdAt: Joi.date().optional(),
 });
 
-export const validateUser = (user: any) => {
-  return schema.validate(user);
+export const validateSignupUser = (user: any) => {
+  return signupUserSchema.validate(user);
 };
 
 export default User;
