@@ -1,6 +1,11 @@
 import mongoose from "mongoose";
 import Joi from "joi";
+import { parsePhoneNumberFromString } from "libphonenumber-js";
 
+const phoneNumberFormatter = (inputPhoneNumber: string): String => {
+  const phoneNumber = parsePhoneNumberFromString(inputPhoneNumber, "US");
+  return phoneNumber?.formatNational() as string;
+};
 // Geo Schema
 const geoSchema = new mongoose.Schema({
   lat: { type: String, required: true },
