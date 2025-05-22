@@ -1,8 +1,9 @@
 import express, { Request, Response, Router, NextFunction } from "express";
-import Customer, { validateWelcome } from "../models/customer.js";
+import Customer, { validateWelcome as validateCustomer } from "../models/customer.js";
 import { AppError } from "../utils/errors.js";
 import { parsePhoneNumberFromString, PhoneNumber } from "libphonenumber-js";
 import authMiddleware from "../middleware/auth.js";
+import { validateProduct } from "../models/product.js";
 
 const router: Router = express.Router();
 
@@ -12,7 +13,7 @@ router.post(
   authMiddleware,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { error } = validateWelcome(req.body);
+      const { error } = validateCustomer(req.body);
       if (error) {
         return next(new AppError(error.message, 400));
       }
@@ -51,6 +52,7 @@ router.get("/", async (req: Request, res: Response, next: NextFunction) => {
     next(new AppError(error.message, 500));
   }
 });
+
 router.get(
   "/page/:number",
   async (req: Request, res: Response, next: NextFunction) => {
@@ -85,7 +87,7 @@ router.put(
   authMiddleware,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { error } = validateWelcome(req.body);
+      const { error } = validateCustomer(req.body);
       if (error) {
         return next(new AppError(error.message, 400));
       }
@@ -118,6 +120,45 @@ router.delete(
         return next(new AppError("Welcome not found", 404));
       }
       res.status(204).send();
+    } catch (error: any) {
+      next(new AppError(error.message, 500));
+    }
+  }
+);
+
+// Bulk create Customers
+router.post(
+  "/bulk",
+  authMiddleware,
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      if (!Array.isArray(req.body)) {
+        return next(
+          new AppError("Request body must be an array of products", 400)
+        );
+      }
+
+      // Validate each product
+      req.body.forEach((product, index) => {
+        const { error } = validateCustomer(product);
+        if (error) {
+          return next(
+            new AppError(`Product at index ${index}: ${error.message}`, 400)
+          );
+        }
+      });
+
+      // Create all products in a single operation
+      const products = await Customer.insertMany(req.body, {
+        ordered: false, // Continues inserting even if there are errors
+        rawResult: false, // Returns the documents instead of raw result
+      });
+
+      res.status(201).json({
+        success: true,
+        count: products.length,
+        products,
+      });
     } catch (error: any) {
       next(new AppError(error.message, 500));
     }
