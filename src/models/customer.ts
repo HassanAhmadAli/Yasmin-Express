@@ -25,7 +25,6 @@ const companySchema = new mongoose.Schema({
 
 // Welcome Schema
 const customerSchema = new mongoose.Schema({
-  id: { type: Number, required: true },
   name: { type: String, required: true },
   username: { type: String, required: true, unique: true },
   email: { type: String, required: true, unique: true },
@@ -56,7 +55,7 @@ const companyValidationSchema = Joi.object({
 });
 
 const customerValidationSchema = Joi.object({
-  id: Joi.number().required(),
+  id: Joi.number().optional(),
   name: Joi.string().required(),
   username: Joi.string().required(),
   email: Joi.string().email().required(),

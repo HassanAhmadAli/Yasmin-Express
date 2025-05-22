@@ -1,5 +1,7 @@
 import express, { Request, Response, Router, NextFunction } from "express";
-import Customer, { validateWelcome as validateCustomer } from "../models/customer.js";
+import Customer, {
+  validateWelcome as validateCustomer,
+} from "../models/customer.js";
 import { AppError } from "../utils/errors.js";
 import { parsePhoneNumberFromString, PhoneNumber } from "libphonenumber-js";
 import authMiddleware from "../middleware/auth.js";
@@ -71,7 +73,7 @@ router.get(
 // Get customer by id
 router.get("/:id", async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const customer = await Customer.findOne({ id: req.params.id });
+    const customer = await Customer.findById(req.params.id);
     if (!customer) {
       return next(new AppError("Welcome not found", 404));
     }
@@ -92,14 +94,14 @@ router.put(
         return next(new AppError(error.message, 400));
       }
 
-      const customer = await Customer.findOneAndUpdate(
-        { id: req.params.id },
+      const customer = await Customer.findByIdAndUpdate(
+        req.params.id,
         req.body,
         { new: true, runValidators: true }
       );
 
       if (!customer) {
-        return next(new AppError("Welcome not found", 404));
+        return next(new AppError("Customer not found", 404));
       }
 
       res.json(customer);
@@ -115,7 +117,7 @@ router.delete(
   authMiddleware,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const customer = await Customer.findOneAndDelete({ id: req.params.id });
+      const customer = await Customer.findByIdAndDelete(req.params.id);
       if (!customer) {
         return next(new AppError("Welcome not found", 404));
       }
