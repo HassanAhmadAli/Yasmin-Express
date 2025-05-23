@@ -14,8 +14,13 @@ import cookieParser from "cookie-parser";
 import session from "express-session";
 import bodyParser from "body-parser";
 import morgan from "morgan";
-
+import cors from "cors";
 const app = express();
+// // Bypass CORS Protection
+// const corsOptions = {
+//   origin: /^.*/,
+// };
+// app.use(cors(corsOptions));
 app.use(async (req, res, next) => {
   setTimeout(next, 1000);
 });

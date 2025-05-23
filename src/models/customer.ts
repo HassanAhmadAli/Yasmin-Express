@@ -2,10 +2,6 @@ import mongoose from "mongoose";
 import Joi from "joi";
 import { parsePhoneNumberFromString } from "libphonenumber-js";
 
-const phoneNumberFormatter = (inputPhoneNumber: string): String => {
-  const phoneNumber = parsePhoneNumberFromString(inputPhoneNumber, "US");
-  return phoneNumber?.formatNational() as string;
-};
 // Geo Schema
 const geoSchema = new mongoose.Schema({
   lat: { type: String, required: true },
@@ -28,13 +24,27 @@ const companySchema = new mongoose.Schema({
   bs: { type: String, required: true },
 });
 
-// Welcome Schema
+// Customer Schema
 const customerSchema = new mongoose.Schema({
   name: { type: String, required: true },
   username: { type: String, required: true, unique: true },
   email: { type: String, required: true, unique: true },
   address: { type: addressSchema, required: true },
-  phone: { type: String, required: true },
+  phone: {
+    type: String,
+    required: true,
+    set: (phone: string) => {
+      try {
+        const phoneNumber = parsePhoneNumberFromString(phone, "US");
+        if (!phoneNumber) {
+          throw new Error("Invalid phone number");
+        }
+        return phoneNumber.format("E.164"); // Returns standardized format like +12133734253
+      } catch (error) {
+        throw new Error("Invalid phone number format");
+      }
+    },
+  },
   website: { type: String, required: true },
   company: { type: companySchema, required: true },
 });

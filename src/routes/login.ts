@@ -12,7 +12,7 @@ import csurf from "csurf";
 import { validateLoginUser } from "../models/user.js";
 const authRoutes = express.Router();
 const csrf = csurf({
-  ignoreMethods: ["POST", "OPTIONS"],
+  ignoreMethods: ["POST"],
   cookie: {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
