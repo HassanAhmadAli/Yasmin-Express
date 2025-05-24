@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import Joi from "joi";
+import { parsePhoneNumberFromString } from "libphonenumber-js";
 
 // Geo Schema
 const geoSchema = new mongoose.Schema({
@@ -23,14 +24,27 @@ const companySchema = new mongoose.Schema({
   bs: { type: String, required: true },
 });
 
-// Welcome Schema
+// Customer Schema
 const customerSchema = new mongoose.Schema({
-  id: { type: Number, required: true },
   name: { type: String, required: true },
   username: { type: String, required: true, unique: true },
   email: { type: String, required: true, unique: true },
   address: { type: addressSchema, required: true },
-  phone: { type: String, required: true },
+  phone: {
+    type: String,
+    required: true,
+    set: (phone: string) => {
+      try {
+        const phoneNumber = parsePhoneNumberFromString(phone, "US");
+        if (!phoneNumber) {
+          throw new Error("Invalid phone number");
+        }
+        return phoneNumber.format("E.164"); // Returns standardized format like +12133734253
+      } catch (error) {
+        throw new Error("Invalid phone number format");
+      }
+    },
+  },
   website: { type: String, required: true },
   company: { type: companySchema, required: true },
 });
@@ -56,7 +70,7 @@ const companyValidationSchema = Joi.object({
 });
 
 const customerValidationSchema = Joi.object({
-  id: Joi.number().required(),
+  id: Joi.number().optional(),
   name: Joi.string().required(),
   username: Joi.string().required(),
   email: Joi.string().email().required(),
@@ -66,9 +80,9 @@ const customerValidationSchema = Joi.object({
   company: companyValidationSchema,
 });
 
-export const validateWelcome = (welcome: any) => {
-  return customerValidationSchema.validate(welcome);
+export const validateCustomer = (customer: any) => {
+  return customerValidationSchema.validate(customer);
 };
 
-const Customer = mongoose.model("Welcome", customerSchema);
+const Customer = mongoose.model("customer", customerSchema);
 export default Customer;

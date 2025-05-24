@@ -1,8 +1,11 @@
 import express, { Request, Response, Router, NextFunction } from "express";
-import Customer, { validateWelcome } from "../models/customer.js";
+import Customer, {
+  validateCustomer as validateCustomer,
+} from "../models/customer.js";
 import { AppError } from "../utils/errors.js";
 import { parsePhoneNumberFromString, PhoneNumber } from "libphonenumber-js";
 import authMiddleware from "../middleware/auth.js";
+import { validateProduct } from "../models/product.js";
 
 const router: Router = express.Router();
 
@@ -12,15 +15,15 @@ router.post(
   authMiddleware,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { error } = validateWelcome(req.body);
+      const { error } = validateCustomer(req.body);
       if (error) {
         return next(new AppError(error.message, 400));
       }
 
-      const existingWelcome = await Customer.findOne({
+      const existingCustomer = await Customer.findOne({
         username: req.body.username,
       });
-      if (existingWelcome) {
+      if (existingCustomer) {
         return next(new AppError("Username already exists", 409));
       }
       try {
@@ -42,7 +45,50 @@ router.post(
   }
 );
 
-// Get all customer
+router.post(
+  "/search",
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      if (!req.body || typeof req.body.term !== "string") {
+        return next(
+          new AppError("Search term is required and must be a string", 400)
+        );
+      }
+
+      const { term, type } = req.body;
+
+      if (term.trim().length === 0) {
+        return next(new AppError("Search term cannot be empty", 400));
+      }
+
+      // Create a case-insensitive regex pattern
+      const searchRegex = new RegExp(term, "i");
+      if (!type) {
+        const customers = await Customer.find({
+          $or: [
+            { name: searchRegex },
+            { email: searchRegex },
+            { address: searchRegex },
+            { username: searchRegex },
+          ],
+        });
+        res.json(customers);
+        return;
+      } else {
+        const searchTypeRegex = new RegExp(term, "i");
+        const customers = await Customer.find({
+          [type]: searchTypeRegex,
+        });
+        res.json(customers);
+        return;
+      }
+    } catch (error: any) {
+      next(new AppError(error.message, 500));
+    }
+  }
+);
+
+// Get any customer
 router.get("/", async (req: Request, res: Response, next: NextFunction) => {
   try {
     const customers = await Customer.find();
@@ -51,6 +97,7 @@ router.get("/", async (req: Request, res: Response, next: NextFunction) => {
     next(new AppError(error.message, 500));
   }
 });
+
 router.get(
   "/page/:number",
   async (req: Request, res: Response, next: NextFunction) => {
@@ -69,9 +116,9 @@ router.get(
 // Get customer by id
 router.get("/:id", async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const customer = await Customer.findOne({ id: req.params.id });
+    const customer = await Customer.findById(req.params.id);
     if (!customer) {
-      return next(new AppError("Welcome not found", 404));
+      return next(new AppError("Customer not found", 404));
     }
     res.json(customer);
   } catch (error: any) {
@@ -85,19 +132,19 @@ router.put(
   authMiddleware,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { error } = validateWelcome(req.body);
+      const { error } = validateCustomer(req.body);
       if (error) {
         return next(new AppError(error.message, 400));
       }
 
-      const customer = await Customer.findOneAndUpdate(
-        { id: req.params.id },
+      const customer = await Customer.findByIdAndUpdate(
+        req.params.id,
         req.body,
         { new: true, runValidators: true }
       );
 
       if (!customer) {
-        return next(new AppError("Welcome not found", 404));
+        return next(new AppError("Customer not found", 404));
       }
 
       res.json(customer);
@@ -113,9 +160,9 @@ router.delete(
   authMiddleware,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const customer = await Customer.findOneAndDelete({ id: req.params.id });
+      const customer = await Customer.findByIdAndDelete(req.params.id);
       if (!customer) {
-        return next(new AppError("Welcome not found", 404));
+        return next(new AppError("Customer not found", 404));
       }
       res.status(204).send();
     } catch (error: any) {
@@ -124,4 +171,42 @@ router.delete(
   }
 );
 
+// Bulk create Customers
+router.post(
+  "/bulk",
+  authMiddleware,
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      if (!Array.isArray(req.body)) {
+        return next(
+          new AppError("Request body must be an array of products", 400)
+        );
+      }
+
+      // Validate each product
+      req.body.forEach((product, index) => {
+        const { error } = validateCustomer(product);
+        if (error) {
+          return next(
+            new AppError(`Product at index ${index}: ${error.message}`, 400)
+          );
+        }
+      });
+
+      // Create all products in a single operation
+      const products = await Customer.insertMany(req.body, {
+        ordered: false, // Continues inserting even if there are errors
+        rawResult: false, // Returns the documents instead of raw result
+      });
+
+      res.status(201).json({
+        success: true,
+        count: products.length,
+        products,
+      });
+    } catch (error: any) {
+      next(new AppError(error.message, 500));
+    }
+  }
+);
 export default router;

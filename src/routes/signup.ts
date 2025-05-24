@@ -1,5 +1,5 @@
 import express, { Request, Response, Router, NextFunction } from "express";
-import User, { validateUser } from "../models/user.js";
+import User, { validateSignupUser } from "../models/user.js";
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import { AppError } from "../utils/errors.js";
@@ -10,7 +10,7 @@ const app: Router = express.Router();
 app.post("/", async (req: Request, res: Response, next: NextFunction) => {
   try {
     // Validate input
-    const { error } = validateUser(req.body);
+    const { error } = validateSignupUser(req.body);
     if (error) {
       return next(new AppError(error.message, 400));
     }
