@@ -15,6 +15,7 @@ import session from "express-session";
 import bodyParser from "body-parser";
 import morgan from "morgan";
 import cors from "cors";
+import { PostRouter } from "./routes/post.js";
 const app = express();
 // // Bypass CORS Protection
 // const corsOptions = {
@@ -46,6 +47,7 @@ app.use("/api/login", authRoutes);
 app.use("/api/customer", customerRoutes);
 app.use("/api/products", productRoutes);
 app.use("/public", publicRouter);
+app.use("/api/post", PostRouter);
 app.use(
   (req: express.Request, res: express.Response, next: express.NextFunction) => {
     console.log(req.url);

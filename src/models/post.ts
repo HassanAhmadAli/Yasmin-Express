@@ -15,6 +15,14 @@ const PostJoiSchema = Joi.object({
 export function validatePost(post: unknown) {
   return PostJoiSchema.validate(post);
 }
+const PostUpdateJoiSchema = Joi.object({
+  userId: Joi.string().optional(),
+  title: Joi.string().optional(),
+  body: Joi.string().optional(),
+});
+export function validateUpdatePost(post: unknown) {
+  return PostUpdateJoiSchema.validate(post);
+}
 
 export type PostSchemaType = mongoose.InferSchemaType<typeof PostSchema>;
 
