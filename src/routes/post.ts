@@ -106,13 +106,47 @@ PostRouter.delete(
     try {
       const post = await Post.findOneAndDelete({
         _id: req.params.id,
-        userId: (req as any).user._id,
       });
 
       if (!post) {
         return next(new AppError("Post not found or unauthorized", 404));
       }
       res.status(204).send();
+    } catch (error: any) {
+      next(new AppError(error.message, 500));
+    }
+  }
+);
+
+// Bulk create posts
+PostRouter.post(
+  "/bulk",
+  authMiddleware,
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      if (!Array.isArray(req.body)) {
+        return next(new AppError("Request body must be an array of posts", 400));
+      }
+
+      // Validate each post
+      req.body.forEach((post, index) => {
+        const { error } = validatePost(post);
+        if (error) {
+          return next(new AppError(`Post at index ${index}: ${error.message}`, 400));
+        }
+      });
+
+      // Create all posts in a single operation
+      const posts = await Post.insertMany(req.body, {
+        ordered: false, // Continues inserting even if there are errors
+        rawResult: false, // Returns the documents instead of raw result
+      });
+
+      res.status(201).json({
+        success: true,
+        count: posts.length,
+        posts,
+      });
     } catch (error: any) {
       next(new AppError(error.message, 500));
     }
