@@ -1,5 +1,5 @@
 {
-  "watch": ["src"],
+  "watch": ["out"],
   "ext": "js,json,ts,tsx,jsx,html,css",
   "verbose": true,
   "delay": 300,
