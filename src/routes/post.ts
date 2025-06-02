@@ -3,6 +3,7 @@ import { Post, validatePost, validateUpdatePost } from "../models/post.js";
 import { AppError } from "../utils/errors.js";
 import authMiddleware from "../middleware/auth.js";
 
+
 export const PostRouter: Router = express.Router();
 
 // Create new post
@@ -27,7 +28,10 @@ PostRouter.post(
 // Get all posts
 PostRouter.get("/", async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const posts = await Post.find().populate("userId", "username email");
+    const posts = await Post.find()
+      .populate("customer")
+      .exec();
+
     res.json(posts);
   } catch (error: any) {
     next(new AppError(error.message, 500));
@@ -41,7 +45,7 @@ PostRouter.get(
     try {
       const number = parseInt(req.params.number);
       const posts = await Post.find()
-        .populate("userId", "username email")
+        .populate("customerId", "username email")
         .skip((number - 1) * 10)
         .limit(10);
       res.json(posts);
@@ -57,7 +61,7 @@ PostRouter.get(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const post = await Post.findById(req.params.id).populate(
-        "userId",
+        "customer",
         "username email"
       );
       if (!post) {
@@ -125,14 +129,18 @@ PostRouter.post(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       if (!Array.isArray(req.body)) {
-        return next(new AppError("Request body must be an array of posts", 400));
+        return next(
+          new AppError("Request body must be an array of posts", 400)
+        );
       }
 
       // Validate each post
       req.body.forEach((post, index) => {
         const { error } = validatePost(post);
         if (error) {
-          return next(new AppError(`Post at index ${index}: ${error.message}`, 400));
+          return next(
+            new AppError(`Post at index ${index}: ${error.message}`, 400)
+          );
         }
       });
 

@@ -1,14 +1,19 @@
 import Joi, { ref } from "joi";
 import mongoose from "mongoose";
-import User from "./user.js";
+import Customer from "./customer.js";
 
 const PostSchema = new mongoose.Schema({
-  userId: { type: mongoose.Types.ObjectId, ref: User },
+  customer: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    ref: Customer,
+  },
+
   title: { type: String, required: true },
   body: { type: String, required: true },
 });
 const PostJoiSchema = Joi.object({
-  userId: Joi.string().required(),
+  customer: Joi.string().required(),
   title: Joi.string().required(),
   body: Joi.string().required(),
 });
@@ -16,7 +21,7 @@ export function validatePost(post: unknown) {
   return PostJoiSchema.validate(post);
 }
 const PostUpdateJoiSchema = Joi.object({
-  userId: Joi.string().optional(),
+  customer: Joi.string().optional(),
   title: Joi.string().optional(),
   body: Joi.string().optional(),
 });
