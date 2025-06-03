@@ -3,7 +3,6 @@ import { Post, validatePost, validateUpdatePost } from "../models/post.js";
 import { AppError } from "../utils/errors.js";
 import authMiddleware from "../middleware/auth.js";
 
-
 export const PostRouter: Router = express.Router();
 
 // Create new post
@@ -28,9 +27,7 @@ PostRouter.post(
 // Get all posts
 PostRouter.get("/", async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const posts = await Post.find()
-      .populate("customer")
-      .exec();
+    const posts = await Post.find().populate("customer").exec();
 
     res.json(posts);
   } catch (error: any) {
@@ -45,9 +42,10 @@ PostRouter.get(
     try {
       const number = parseInt(req.params.number);
       const posts = await Post.find()
-        .populate("customerId", "username email")
+        .populate("customer")
         .skip((number - 1) * 10)
-        .limit(10);
+        .limit(10)
+        .exec();
       res.json(posts);
     } catch (error: any) {
       next(new AppError(error.message, 500));
@@ -60,10 +58,9 @@ PostRouter.get(
   "/:id",
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const post = await Post.findById(req.params.id).populate(
-        "customer",
-        "username email"
-      );
+      const post = await Post.findById(req.params.id)
+        .populate("customer")
+        .exec();
       if (!post) {
         return next(new AppError("Post not found", 404));
       }
