@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { z } from "zod/v4";
+import { z } from "../lib/zod.js";
 const CategoryEnum = {
   Electronics: "electronics",
   Jewelery: "jewelery",

@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { z } from "zod/v4";
+import { z } from "../lib/zod.js";
 import { geoInputSchema, geoMongooseSchema } from "./geo.js";
 export const addressMongooseSchema = new mongoose.Schema({
   street: { type: String, required: true },

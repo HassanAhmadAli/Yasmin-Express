@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import { parsePhoneNumberFromString } from "libphonenumber-js";
-import { z } from "zod/v4";
+import { z } from "../lib/zod.js";
 import { addressInputSchema, addressMongooseSchema } from "./address.js";
 import { companyInputSchema, companyMongooseSchema } from "./company.js";
 export const customerMongooseSchema = new mongoose.Schema({

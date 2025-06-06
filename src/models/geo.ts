@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { z } from "zod/v4";
+import { z } from "../lib/zod.js";
 
 export const geoMongooseSchema = new mongoose.Schema({
   lat: { type: String, required: true },

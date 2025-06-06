@@ -2,7 +2,7 @@ import mongoose, { InferSchemaType } from "mongoose";
 import env from "../utils/env.js";
 import jsonwebtoken from "jsonwebtoken";
 import _ from "lodash";
-import { z } from "zod/v4";
+import { z } from "../lib/zod.js";
 import bcrypt from "bcrypt";
 const UserMongooseSchema = new mongoose.Schema(
   {

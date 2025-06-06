@@ -1,4 +1,4 @@
-import { z, ZodError } from "zod/v4";
+import { z, ZodError } from "../lib/zod.js";
 
 export class AppError extends Error {
   statusCode: number;
