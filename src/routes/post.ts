@@ -3,7 +3,7 @@ import {
   PostModel,
   PostDoc,
   PostInputSchema,
-  BulkPostInputSchema,
+  PostBulkInputSchema,
 } from "../models/post.js";
 import { AppError } from "../utils/errors.js";
 import authMiddleware from "../middleware/auth.js";
@@ -16,11 +16,11 @@ PostRouter.post(
   authMiddleware,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const parseResult = PostInputSchema.safeParse(req.body);
-      if (!parseResult.success) {
-        return next(new AppError(parseResult.error.message, 400));
+      const { success, error, data } = PostInputSchema.safeParse(req.body);
+      if (!success) {
+        return next(AppError.fromZodError(error, 400));
       }
-      const post = new PostModel(parseResult.data);
+      const post = new PostModel(data);
       const result = await post.save();
       res.status(201).json(result);
     } catch (error: any) {
@@ -127,12 +127,12 @@ PostRouter.post(
   authMiddleware,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const parseRes = BulkPostInputSchema.safeParse(req.body);
-      if (!parseRes.success) {
-        next(new AppError(parseRes.error.message, 400));
+      const { success, error, data } = PostBulkInputSchema.safeParse(req.body);
+      if (!success) {
+        return next(AppError.fromZodError(error, 400));
       }
       // Create all posts in a single operation
-      const posts = await PostModel.insertMany(parseRes.data, {
+      const posts = await PostModel.insertMany(data, {
         ordered: false, // Continues inserting even if there are errors
         rawResult: false, // Returns the documents instead of raw result
       });

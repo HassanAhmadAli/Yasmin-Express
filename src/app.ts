@@ -1,6 +1,5 @@
 import { rootDir, publicDir } from "./utils/path.js";
 import express, { Request, Response, NextFunction } from "express";
-import user from "./models/user.js";
 import mongoose from "mongoose";
 import signupRoute from "./routes/signup.js";
 import errorHandler from "./middleware/errorHandler.js";

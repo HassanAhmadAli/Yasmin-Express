@@ -1,15 +1,11 @@
 import express, { Request, Response, Router, NextFunction } from "express";
-import User from "../models/user.js";
-import mongoose from "mongoose";
+import { UserModel, LoginUserInputSchema } from "../models/user.js";
+
 import bcrypt from "bcrypt";
 import { AppError } from "../utils/errors.js";
 import _ from "lodash";
-import Joi from "joi";
-import password_validator from "../utils/password_validator.js";
-import jsonwebtoken from "jsonwebtoken";
-import env from "../utils/env.js";
+
 import csurf from "csurf";
-import { validateLoginUser } from "../models/user.js";
 const authRoutes = express.Router();
 const csrf = csurf({
   ignoreMethods: ["POST"],
@@ -25,19 +21,16 @@ authRoutes.post(
     const invalidLoginMessage = "Invalid Email Or Password";
     try {
       // Validate input
-      const { error } = validateLoginUser(req.body);
-      if (error) {
-        return next(new AppError(error.message, 400));
+      const { error, data, success } = LoginUserInputSchema.safeParse(req.body);
+      if (!success) {
+        return next(AppError.fromZodError(error, 400));
       }
-
-      // Check if user already exists
-
-      const existingUser = await User.findOne({ email: req.body.email });
+      const existingUser = await UserModel.findOne({ email: data.email });
       if (!existingUser) {
         return next(new AppError(invalidLoginMessage, 409));
       }
       const validPassword = await bcrypt.compare(
-        req.body.password,
+        data.password,
         existingUser.password
       );
       if (!validPassword) {

@@ -1,12 +1,13 @@
 import express, { Request, Response, Router, NextFunction } from "express";
-import Customer, {
-  validateCustomer as validateCustomer,
+import {
+  CustomerModel,
+  CustomerInputSchema,
+  customerMongooseSchema,
+  CustomerBulkInputSchema,
 } from "../models/customer.js";
 import { AppError } from "../utils/errors.js";
-import { parsePhoneNumberFromString, PhoneNumber } from "libphonenumber-js";
 import authMiddleware from "../middleware/auth.js";
-import { validateProduct } from "../models/product.js";
-
+import { fromZodError } from "zod-validation-error";
 const router: Router = express.Router();
 
 // Create new customer
@@ -15,31 +16,18 @@ router.post(
   authMiddleware,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { error } = validateCustomer(req.body);
-      if (error) {
-        return next(new AppError(error.message, 400));
+      const { success, error, data } = CustomerInputSchema.safeParse(req.body);
+      if (!success) {
+        return next(AppError.fromZodError(error, 400));
       }
-
-      const existingCustomer = await Customer.findOne({
-        username: req.body.username,
-      });
-      if (existingCustomer) {
-        return next(new AppError("Username already exists", 409));
-      }
-      try {
-        const phoneNumber = parsePhoneNumberFromString(
-          req.body.phone,
-          "US"
-        ) as PhoneNumber;
-        req.body.phone = phoneNumber.format("E.164");
-      } catch (error: any) {
-        next(new AppError(error.message, 500));
-      }
-
-      const customer = new Customer(req.body);
+      const customer = new CustomerModel(data);
       const result = await customer.save();
       res.status(201).json(result);
     } catch (error: any) {
+      if (error.code === 11000) {
+        const duplicateField = Object.keys(error.keyValue || {}).join(", ");
+        return next(new AppError(`${duplicateField} already exists`, 409));
+      }
       next(new AppError(error.message, 500));
     }
   }
@@ -49,22 +37,19 @@ router.post(
   "/search",
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      if (!req.body || typeof req.body.term !== "string") {
+      if (!req.body || !(typeof req.body.term === "string")) {
         return next(
           new AppError("Search term is required and must be a string", 400)
         );
       }
-
       const { term, type } = req.body;
-
       if (term.trim().length === 0) {
         return next(new AppError("Search term cannot be empty", 400));
       }
-
       // Create a case-insensitive regex pattern
       const searchRegex = new RegExp(term, "i");
       if (!type) {
-        const customers = await Customer.find({
+        const customers = await CustomerModel.find({
           $or: [
             { name: searchRegex },
             { email: searchRegex },
@@ -76,7 +61,7 @@ router.post(
         return;
       } else {
         const searchTypeRegex = new RegExp(term, "i");
-        const customers = await Customer.find({
+        const customers = await CustomerModel.find({
           [type]: searchTypeRegex,
         });
         res.json(customers);
@@ -91,7 +76,7 @@ router.post(
 // Get any customer
 router.get("/", async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const customers = await Customer.find();
+    const customers = await CustomerModel.find();
     res.json(customers);
   } catch (error: any) {
     next(new AppError(error.message, 500));
@@ -103,7 +88,7 @@ router.get(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const number: any = req.params.number;
-      const customers = await Customer.find()
+      const customers = await CustomerModel.find()
         .skip((number - 1) * 7)
         .limit(7);
       res.json(customers);
@@ -116,7 +101,7 @@ router.get(
 // Get customer by id
 router.get("/:id", async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const customer = await Customer.findById(req.params.id);
+    const customer = await CustomerModel.findById(req.params.id);
     if (!customer) {
       return next(new AppError("Customer not found", 404));
     }
@@ -132,21 +117,18 @@ router.put(
   authMiddleware,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { error } = validateCustomer(req.body);
+      const { error, data, success } = CustomerInputSchema.safeParse(req.body);
       if (error) {
         return next(new AppError(error.message, 400));
       }
-
-      const customer = await Customer.findByIdAndUpdate(
+      const customer = await CustomerModel.findByIdAndUpdate(
         req.params.id,
-        req.body,
+        data,
         { new: true, runValidators: true }
       );
-
       if (!customer) {
         return next(new AppError("Customer not found", 404));
       }
-
       res.json(customer);
     } catch (error: any) {
       next(new AppError(error.message, 500));
@@ -160,7 +142,7 @@ router.delete(
   authMiddleware,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const customer = await Customer.findByIdAndDelete(req.params.id);
+      const customer = await CustomerModel.findByIdAndDelete(req.params.id);
       if (!customer) {
         return next(new AppError("Customer not found", 404));
       }
@@ -182,23 +164,17 @@ router.post(
           new AppError("Request body must be an array of products", 400)
         );
       }
-
-      // Validate each product
-      req.body.forEach((product, index) => {
-        const { error } = validateCustomer(product);
-        if (error) {
-          return next(
-            new AppError(`Product at index ${index}: ${error.message}`, 400)
-          );
-        }
-      });
-
+      const { error, success, data } = CustomerBulkInputSchema.safeParse(
+        req.body
+      );
+      if (!success) {
+        return next(AppError.fromZodError(error, 400));
+      }
       // Create all products in a single operation
-      const products = await Customer.insertMany(req.body, {
-        ordered: false, // Continues inserting even if there are errors
-        rawResult: false, // Returns the documents instead of raw result
+      const products = await CustomerModel.insertMany(data, {
+        ordered: false,
+        rawResult: false,
       });
-
       res.status(201).json({
         success: true,
         count: products.length,

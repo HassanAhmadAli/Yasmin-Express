@@ -26,9 +26,6 @@ importers:
       '@types/express-session':
         specifier: ^1.18.1
         version: 1.18.1
-      '@types/joi-password-complexity':
-        specifier: ^3.1.0
-        version: 3.1.0
       '@types/logger':
         specifier: ^0.0.5
         version: 0.0.5
@@ -65,12 +62,6 @@ importers:
       express-session:
         specifier: ^1.18.1
         version: 1.18.1
-      joi:
-        specifier: ^17.13.3
-        version: 17.13.3
-      joi-password-complexity:
-        specifier: ^5.2.0
-        version: 5.2.0(joi@17.13.3)
       jsonwebtoken:
         specifier: ^9.0.2
         version: 9.0.2
@@ -92,9 +83,6 @@ importers:
       zod:
         specifier: ^3.25.55
         version: 3.25.55
-      zod-validation-error:
-        specifier: ^3.4.1
-        version: 3.4.1(zod@3.25.55)
     devDependencies:
       '@eslint/js':
         specifier: ^9.28.0
@@ -108,9 +96,6 @@ importers:
       '@types/express':
         specifier: ^5.0.2
         version: 5.0.2
-      '@types/joi':
-        specifier: ^17.2.3
-        version: 17.2.3
       '@types/jsonwebtoken':
         specifier: ^9.0.9
         version: 9.0.9
@@ -189,12 +174,6 @@ packages:
     resolution: {integrity: sha512-0J+zgWxHN+xXONWIyPWKFMgVuJoZuGiIFu8yxk7RJjxkzpGmyja5wRFqZIVtjDVOQpV+Rw0iOAjYPE2eQyjr0w==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
-  '@hapi/hoek@9.3.0':
-    resolution: {integrity: sha512-/c6rf4UJlmHlC9b5BaNvzAcFv7HZ2QHaV0D4/HNlBdvFnvQq8RI4kYdhyPCl7Xj+oWvTWQ8ujhqS53LIgAe6KQ==}
-
-  '@hapi/topo@5.1.0':
-    resolution: {integrity: sha512-foQZKJig7Ob0BMAYBfcJk8d77QtOe7Wo4ox7ff1lQYoNNAb6jwcY1ncdoy2e9wQZzvNy7ODZCYJkK8kzmcAnAg==}
-
   '@humanfs/core@0.19.1':
     resolution: {integrity: sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==}
     engines: {node: '>=18.18.0'}
@@ -243,15 +222,6 @@ packages:
   '@nodelib/fs.walk@1.2.8':
     resolution: {integrity: sha512-oGB+UxlgWcgQkgwo8GcEGwemoTFt3FIO9ababBmaGwXIoBKZ+GTy0pP185beGg7Llih/NSHSV2XAs1lnznocSg==}
     engines: {node: '>= 8'}
-
-  '@sideway/address@4.1.5':
-    resolution: {integrity: sha512-IqO/DUQHUkPeixNQ8n0JA6102hT9CmaljNTPmQ1u8MEhBo/R4Q8eKLN/vGZxuebwOroDB4cbpjheD4+/sKFK4Q==}
-
-  '@sideway/formula@3.0.1':
-    resolution: {integrity: sha512-/poHZJJVjx3L+zVD6g9KgHfYnb443oi7wLu/XKojDviHy6HOEOA6z1Trk5aR1dGcmPenJEgb2sK2I80LeS3MIg==}
-
-  '@sideway/pinpoint@2.0.0':
-    resolution: {integrity: sha512-RNiOoTPkptFtSVzQevY/yWtZwf/RxyVnPy/OcA9HBM3MlGDnBEYL5B41H0MTn0Uec8Hi+2qUtTfG2WWZBmMejQ==}
 
   '@tsconfig/node10@1.0.11':
     resolution: {integrity: sha512-DcRjDCujK/kCk/cUe8Xz8ZSpm8mS3mNNpta+jGCA6USEDfktlNvm1+IuZ9eTcDbNk41BHwpHHeW+N1lKCz4zOw==}
@@ -305,13 +275,6 @@ packages:
 
   '@types/http-errors@2.0.4':
     resolution: {integrity: sha512-D0CFMMtydbJAegzOyHjtiKPLlvnm3iTZyZRSZoLq2mRhDdmLfIWOCYPfQJ4cu2erKghU++QvjcUjp/5h7hESpA==}
-
-  '@types/joi-password-complexity@3.1.0':
-    resolution: {integrity: sha512-qJsbVSxM+4ID/kE26drRB+lR3AJsA6Ny126TaKvbcrusnlUpOLgkR49Y57Qn8ufJbGi6bHN9iRWStPSwht/K7Q==}
-
-  '@types/joi@17.2.3':
-    resolution: {integrity: sha512-dGjs/lhrWOa+eO0HwgxCSnDm5eMGCsXuvLglMghJq32F6q5LyyNuXb41DHzrg501CKNOSSAHmfB7FDGeUnDmzw==}
-    deprecated: This is a stub types definition. joi provides its own type definitions, so you do not need this installed.
 
   '@types/json-schema@7.0.15':
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
@@ -1172,14 +1135,6 @@ packages:
     resolution: {integrity: sha512-H0dkQoCa3b2VEeKQBOxFph+JAbcrQdE7KC0UkqwpLmv2EC4P41QXP+rqo9wYodACiG5/WM5s9oDApTU8utwj9g==}
     engines: {node: '>= 0.4'}
 
-  joi-password-complexity@5.2.0:
-    resolution: {integrity: sha512-exQOcaKC4EuZwwNVQ/5/FcnCzdwdzjA2RPIrRgZXTjzkFhY5NUtP83SlcNSUK3OvbRFpjUq1FCzhHg/uqPg90g==}
-    peerDependencies:
-      joi: '>= 17'
-
-  joi@17.13.3:
-    resolution: {integrity: sha512-otDA4ldcIx+ZXsKHWmp0YizCweVRZG96J10b0FevjfuncLO1oX59THoAmHkNubYJ+9gWsYsp5k8v4ib6oDv1fA==}
-
   js-tokens@4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
 
@@ -1989,12 +1944,6 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
 
-  zod-validation-error@3.4.1:
-    resolution: {integrity: sha512-1KP64yqDPQ3rupxNv7oXhf7KdhHHgaqbKuspVoiN93TT0xrBjql+Svjkdjq/Qh/7GSMmgQs3AfvBT0heE35thw==}
-    engines: {node: '>=18.0.0'}
-    peerDependencies:
-      zod: ^3.24.4
-
   zod@3.25.55:
     resolution: {integrity: sha512-219huNnkSLQnLsQ3uaRjXsxMrVm5C9W3OOpEVt2k5tvMKuA8nBSu38e0B//a+he9Iq2dvmk2VyYVlHqiHa4YBA==}
 
@@ -2048,12 +1997,6 @@ snapshots:
       '@eslint/core': 0.14.0
       levn: 0.4.1
 
-  '@hapi/hoek@9.3.0': {}
-
-  '@hapi/topo@5.1.0':
-    dependencies:
-      '@hapi/hoek': 9.3.0
-
   '@humanfs/core@0.19.1': {}
 
   '@humanfs/node@0.16.6':
@@ -2106,14 +2049,6 @@ snapshots:
     dependencies:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.19.1
-
-  '@sideway/address@4.1.5':
-    dependencies:
-      '@hapi/hoek': 9.3.0
-
-  '@sideway/formula@3.0.1': {}
-
-  '@sideway/pinpoint@2.0.0': {}
 
   '@tsconfig/node10@1.0.11': {}
 
@@ -2174,12 +2109,6 @@ snapshots:
       '@types/serve-static': 1.15.7
 
   '@types/http-errors@2.0.4': {}
-
-  '@types/joi-password-complexity@3.1.0': {}
-
-  '@types/joi@17.2.3':
-    dependencies:
-      joi: 17.13.3
 
   '@types/json-schema@7.0.15': {}
 
@@ -3296,18 +3225,6 @@ snapshots:
       has-symbols: 1.1.0
       set-function-name: 2.0.2
 
-  joi-password-complexity@5.2.0(joi@17.13.3):
-    dependencies:
-      joi: 17.13.3
-
-  joi@17.13.3:
-    dependencies:
-      '@hapi/hoek': 9.3.0
-      '@hapi/topo': 5.1.0
-      '@sideway/address': 4.1.5
-      '@sideway/formula': 3.0.1
-      '@sideway/pinpoint': 2.0.0
-
   js-tokens@4.0.0: {}
 
   js-yaml@4.1.0:
@@ -4169,9 +4086,5 @@ snapshots:
   yn@3.1.1: {}
 
   yocto-queue@0.1.0: {}
-
-  zod-validation-error@3.4.1(zod@3.25.55):
-    dependencies:
-      zod: 3.25.55
 
   zod@3.25.55: {}
