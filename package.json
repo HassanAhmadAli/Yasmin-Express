@@ -22,7 +22,7 @@
   },
   "homepage": "https://github.com/HassanAhmadAli/CFY#readme",
   "devDependencies": {
-    "@eslint/js": "^9.27.0",
+    "@eslint/js": "^9.28.0",
     "@types/config": "^3.3.5",
     "@types/dotenv": "^6.1.1",
     "@types/express": "^5.0.2",
@@ -30,14 +30,14 @@
     "@types/jsonwebtoken": "^9.0.9",
     "@types/lodash": "^4.17.17",
     "@types/mongoose": "^5.11.97",
-    "eslint": "^9.27.0",
+    "eslint": "^9.28.0",
     "eslint-plugin-react": "^7.37.5",
     "globals": "^16.2.0",
     "nodemon": "^3.1.10",
     "ts-node": "^10.9.2",
     "tsc-watch": "^6.3.1",
     "typescript": "^5.8.3",
-    "typescript-eslint": "^8.33.0"
+    "typescript-eslint": "^8.33.1"
   },
   "dependencies": {
     "@types/bcrypt": "^5.0.2",
@@ -62,10 +62,12 @@
     "joi": "^17.13.3",
     "joi-password-complexity": "^5.2.0",
     "jsonwebtoken": "^9.0.2",
-    "libphonenumber-js": "^1.12.8",
+    "libphonenumber-js": "^1.12.9",
     "lodash": "^4.17.21",
     "logger": "^0.0.1",
     "mongoose": "^8.15.1",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "zod": "^3.25.55",
+    "zod-validation-error": "^3.4.1"
   }
 }
