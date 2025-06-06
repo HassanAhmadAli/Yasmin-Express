@@ -6,8 +6,7 @@ import {
 } from "../models/product.js";
 import { AppError } from "../utils/errors.js";
 import authMiddleware from "../middleware/auth.js";
-import { fromError, fromZodError } from "zod-validation-error";
-import { z } from "zod/v4";
+import { z, ZodError } from "../lib/zod.js";
 const router: Router = express.Router();
 
 // Create new product
@@ -16,14 +15,14 @@ router.post(
   authMiddleware,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { error, success, data } = ProductInputSchema.safeParse(req.body);
-      if (!success) {
-        return next(AppError.fromZodError(error, 400));
-      }
+      const data = ProductInputSchema.parse(req.body);
       const product = new ProductModel(data);
       const result = await product.save();
       res.status(201).json(result);
     } catch (error: any) {
+      if (error instanceof ZodError) {
+        return next(AppError.fromZodError(error, 400));
+      }
       next(new AppError(error.message, 500));
     }
   }
@@ -96,29 +95,21 @@ router.post(
           new AppError("Request body must be an array of products", 400)
         );
       }
+      const data = ProductBulkInputSchema.parse(req.body);
 
-      // Validate each product
-
-      const { error, success, data } = ProductBulkInputSchema.safeParse(
-        req.body
-      );
-
-      if (!success) {
-        return next(AppError.fromZodError(error, 400));
-      }
-
-      // Create all products in a single operation
       const products = await ProductModel.insertMany(data, {
-        ordered: false, // Continues inserting even if there are errors
-        rawResult: false, // Returns the documents instead of raw result
+        ordered: false,
+        rawResult: false,
       });
-
       res.status(201).json({
         success: true,
         count: products.length,
         products,
       });
     } catch (error: any) {
+      if (error instanceof ZodError) {
+        return next(AppError.fromZodError(error, 400));
+      }
       next(new AppError(error.message, 500));
     }
   }
@@ -169,13 +160,7 @@ router.put(
   authMiddleware,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { error, success, data } = ProductInputSchema.partial().safeParse(
-        req.body
-      );
-      if (!success) {
-        return next(AppError.fromZodError(error, 400));
-      }
-
+      const data = ProductInputSchema.partial().parse(req.body);
       const product = await ProductModel.findByIdAndUpdate(
         req.params.id,
         data,
@@ -189,6 +174,9 @@ router.put(
       }
       res.json(product);
     } catch (error: any) {
+      if (error instanceof ZodError) {
+        return next(AppError.fromZodError(error, 400));
+      }
       next(new AppError(error.message, 500));
     }
   }

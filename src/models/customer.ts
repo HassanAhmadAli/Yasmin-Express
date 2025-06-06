@@ -27,7 +27,12 @@ export const CustomerInputSchema = z.object({
     }
     return phoneNumber.format("E.164");
   }),
-  website: z.url(),
+  website: z
+    .string()
+    .regex(
+      /^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/\S*)?$/,
+      "invalid Url"
+    ),
   company: companyInputSchema,
 });
 export const CustomerBulkInputSchema = z.array(CustomerInputSchema);

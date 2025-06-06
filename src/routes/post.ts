@@ -7,7 +7,7 @@ import {
 } from "../models/post.js";
 import { AppError } from "../utils/errors.js";
 import authMiddleware from "../middleware/auth.js";
-
+import { z, ZodError } from "../lib/zod.js";
 export const PostRouter: Router = express.Router();
 
 // Create new post
@@ -16,14 +16,14 @@ PostRouter.post(
   authMiddleware,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { success, error, data } = PostInputSchema.safeParse(req.body);
-      if (!success) {
-        return next(AppError.fromZodError(error, 400));
-      }
+      const data = PostInputSchema.parse(req.body);
       const post = new PostModel(data);
       const result = await post.save();
       res.status(201).json(result);
     } catch (error: any) {
+      if (error instanceof ZodError) {
+        return next(AppError.fromZodError(error, 400));
+      }
       next(new AppError(error.message, 500));
     }
   }
@@ -33,7 +33,6 @@ PostRouter.post(
 PostRouter.get("/", async (req: Request, res: Response, next: NextFunction) => {
   try {
     const posts = await PostModel.find().populate("customer").exec();
-
     res.json(posts);
   } catch (error: any) {
     next(new AppError(error.message, 500));
@@ -82,13 +81,11 @@ PostRouter.put(
   authMiddleware,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const parseResult = PostInputSchema.partial().safeParse(req.body);
-      if (!parseResult.success) {
-        return next(new AppError(parseResult.error.message, 400));
-      }
+      const data = PostInputSchema.partial().parse(req.body);
+
       const post = await PostModel.findOneAndUpdate(
         { _id: req.params.id },
-        parseResult.data,
+        data,
         { new: true, runValidators: true }
       );
       if (!post) {
@@ -96,6 +93,9 @@ PostRouter.put(
       }
       res.json(post);
     } catch (error: any) {
+      if (error instanceof ZodError) {
+        return next(AppError.fromZodError(error, 400));
+      }
       next(new AppError(error.message, 500));
     }
   }
@@ -127,10 +127,8 @@ PostRouter.post(
   authMiddleware,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { success, error, data } = PostBulkInputSchema.safeParse(req.body);
-      if (!success) {
-        return next(AppError.fromZodError(error, 400));
-      }
+      const data = PostBulkInputSchema.parse(req.body);
+
       // Create all posts in a single operation
       const posts = await PostModel.insertMany(data, {
         ordered: false, // Continues inserting even if there are errors
@@ -143,6 +141,9 @@ PostRouter.post(
         posts,
       });
     } catch (error: any) {
+      if (error instanceof ZodError) {
+        return next(AppError.fromZodError(error, 400));
+      }
       next(new AppError(error.message, 500));
     }
   }

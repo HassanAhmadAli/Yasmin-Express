@@ -7,7 +7,8 @@ import {
 } from "../models/customer.js";
 import { AppError } from "../utils/errors.js";
 import authMiddleware from "../middleware/auth.js";
-import { fromZodError } from "zod-validation-error";
+import { z, ZodError } from "../lib/zod.js";
+import mongoose from "mongoose";
 const router: Router = express.Router();
 
 // Create new customer
@@ -16,17 +17,19 @@ router.post(
   authMiddleware,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { success, error, data } = CustomerInputSchema.safeParse(req.body);
-      if (!success) {
-        return next(AppError.fromZodError(error, 400));
-      }
+      const data = CustomerInputSchema.parse(req.body);
       const customer = new CustomerModel(data);
       const result = await customer.save();
       res.status(201).json(result);
     } catch (error: any) {
-      if (error.code === 11000) {
-        const duplicateField = Object.keys(error.keyValue || {}).join(", ");
-        return next(new AppError(`${duplicateField} already exists`, 409));
+      if (error instanceof ZodError) {
+        return next(AppError.fromZodError(error, 400));
+      }
+      if (error instanceof mongoose.mongo.MongoServerError) {
+        if (error.code === 11000) {
+          const duplicateField = Object.keys(error.keyValue || {}).join(", ");
+          return next(new AppError(`${duplicateField} already exists`, 409));
+        }
       }
       next(new AppError(error.message, 500));
     }
@@ -117,10 +120,7 @@ router.put(
   authMiddleware,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { error, data, success } = CustomerInputSchema.safeParse(req.body);
-      if (error) {
-        return next(new AppError(error.message, 400));
-      }
+      const data = CustomerInputSchema.parse(req.body);
       const customer = await CustomerModel.findByIdAndUpdate(
         req.params.id,
         data,
@@ -131,6 +131,9 @@ router.put(
       }
       res.json(customer);
     } catch (error: any) {
+      if (error instanceof ZodError) {
+        return next(AppError.fromZodError(error, 400));
+      }
       next(new AppError(error.message, 500));
     }
   }
@@ -159,18 +162,7 @@ router.post(
   authMiddleware,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      if (!Array.isArray(req.body)) {
-        return next(
-          new AppError("Request body must be an array of products", 400)
-        );
-      }
-      const { error, success, data } = CustomerBulkInputSchema.safeParse(
-        req.body
-      );
-      if (!success) {
-        return next(AppError.fromZodError(error, 400));
-      }
-      // Create all products in a single operation
+      const data = CustomerBulkInputSchema.parse(req.body);
       const products = await CustomerModel.insertMany(data, {
         ordered: false,
         rawResult: false,
@@ -181,6 +173,9 @@ router.post(
         products,
       });
     } catch (error: any) {
+      if (error instanceof ZodError) {
+        return next(AppError.fromZodError(error, 400));
+      }
       next(new AppError(error.message, 500));
     }
   }

@@ -38,3 +38,6 @@ export async function hashPassword(password: string): Promise<string> {
   const hashedPassword = await bcrypt.hash(password, salt);
   return hashedPassword;
 }
+export async function comparePasswordWithHash(password: string, hashedPassword: string) {
+  return await bcrypt.compare(password, hashedPassword);
+}
