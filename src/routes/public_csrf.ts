@@ -3,11 +3,12 @@ import authMiddleware from "../middleware/auth.js";
 import { publicDir } from "../utils/path.js";
 const router = express.Router();
 import csurf from "csurf";
+import { env } from "../utils/env.js";
 
 const csrf = csurf({
   cookie: {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: env.NODE_ENV === "production",
   },
 });
 

@@ -10,12 +10,13 @@ import { AppError } from "../utils/errors.js";
 import _ from "lodash";
 import { z, ZodError } from "../lib/zod.js";
 import csurf from "csurf";
+import { env } from "../utils/env.js";
 const authRoutes = express.Router();
 const csrf = csurf({
   ignoreMethods: ["POST"],
   cookie: {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: env.NODE_ENV === "production",
   },
 });
 authRoutes.use(csrf);

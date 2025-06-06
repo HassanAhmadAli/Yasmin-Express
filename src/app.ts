@@ -7,7 +7,7 @@ import authMiddleware from "./middleware/auth.js";
 import authRoutes from "./routes/login.js";
 import customerRoutes from "./routes/customer.js";
 import productRoutes from "./routes/product.js";
-import * as env from "./utils/env.js";
+import { env } from "./utils/env.js";
 import publicRouter from "./routes/public.js";
 import cookieParser from "cookie-parser";
 import session from "express-session";
@@ -35,7 +35,7 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: process.env.NODE_ENV === "production",
+      secure: env.NODE_ENV === "production",
       httpOnly: true,
     },
   })

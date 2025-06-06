@@ -1,5 +1,5 @@
 import mongoose, { InferSchemaType } from "mongoose";
-import env from "../utils/env.js";
+import { env } from "../utils/env.js";
 import jsonwebtoken from "jsonwebtoken";
 import _ from "lodash";
 import { z } from "../lib/zod.js";
@@ -38,6 +38,9 @@ export async function hashPassword(password: string): Promise<string> {
   const hashedPassword = await bcrypt.hash(password, salt);
   return hashedPassword;
 }
-export async function comparePasswordWithHash(password: string, hashedPassword: string) {
+export async function comparePasswordWithHash(
+  password: string,
+  hashedPassword: string
+) {
   return await bcrypt.compare(password, hashedPassword);
 }
