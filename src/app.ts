@@ -7,7 +7,7 @@ import authMiddleware from "./middleware/auth.js";
 import authRoutes from "./routes/login.js";
 import customerRoutes from "./routes/customer.js";
 import productRoutes from "./routes/product.js";
-import env from "./utils/env.js";
+import * as env from "./utils/env.js";
 import publicRouter from "./routes/public.js";
 import cookieParser from "cookie-parser";
 import session from "express-session";
@@ -56,10 +56,6 @@ app.use(
 
 app.use(errorHandler);
 const PORT = env.PORT;
-
-if (!env.MONGODB_URI) {
-  throw new Error("MONGODB_URI is not defined in environment variables");
-}
 
 try {
   await mongoose.connect(env.MONGODB_URI, { dbName: "Yasmeen" });
