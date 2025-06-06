@@ -1,5 +1,10 @@
 import express, { Request, Response, Router, NextFunction } from "express";
-import { Post, validatePost, validateUpdatePost } from "../models/post.js";
+import {
+  PostModel,
+  PostDoc,
+  PostInputSchema,
+  BulkPostInputSchema,
+} from "../models/post.js";
 import { AppError } from "../utils/errors.js";
 import authMiddleware from "../middleware/auth.js";
 
@@ -11,11 +16,11 @@ PostRouter.post(
   authMiddleware,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { error } = validatePost(req.body);
-      if (error) {
-        return next(new AppError(error.message, 400));
+      const parseResult = PostInputSchema.safeParse(req.body);
+      if (!parseResult.success) {
+        return next(new AppError(parseResult.error.message, 400));
       }
-      const post = new Post(req.body);
+      const post = new PostModel(parseResult.data);
       const result = await post.save();
       res.status(201).json(result);
     } catch (error: any) {
@@ -27,7 +32,7 @@ PostRouter.post(
 // Get all posts
 PostRouter.get("/", async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const posts = await Post.find().populate("customer").exec();
+    const posts = await PostModel.find().populate("customer").exec();
 
     res.json(posts);
   } catch (error: any) {
@@ -41,7 +46,7 @@ PostRouter.get(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const number = parseInt(req.params.number);
-      const posts = await Post.find()
+      const posts = await PostModel.find()
         .populate("customer")
         .skip((number - 1) * 10)
         .limit(10)
@@ -58,7 +63,7 @@ PostRouter.get(
   "/:id",
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const post = await Post.findById(req.params.id)
+      const post = await PostModel.findById(req.params.id)
         .populate("customer")
         .exec();
       if (!post) {
@@ -77,21 +82,18 @@ PostRouter.put(
   authMiddleware,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { error } = validateUpdatePost(req.body);
-      if (error) {
-        return next(new AppError(error.message, 400));
+      const parseResult = PostInputSchema.partial().safeParse(req.body);
+      if (!parseResult.success) {
+        return next(new AppError(parseResult.error.message, 400));
       }
-
-      const post = await Post.findOneAndUpdate(
+      const post = await PostModel.findOneAndUpdate(
         { _id: req.params.id },
-        req.body,
+        parseResult.data,
         { new: true, runValidators: true }
       );
-
       if (!post) {
         return next(new AppError("Post not found or unauthorized", 404));
       }
-
       res.json(post);
     } catch (error: any) {
       next(new AppError(error.message, 500));
@@ -105,7 +107,7 @@ PostRouter.delete(
   authMiddleware,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const post = await Post.findOneAndDelete({
+      const post = await PostModel.findOneAndDelete({
         _id: req.params.id,
       });
 
@@ -125,24 +127,12 @@ PostRouter.post(
   authMiddleware,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      if (!Array.isArray(req.body)) {
-        return next(
-          new AppError("Request body must be an array of posts", 400)
-        );
+      const parseRes = BulkPostInputSchema.safeParse(req.body);
+      if (!parseRes.success) {
+        next(new AppError(parseRes.error.message, 400));
       }
-
-      // Validate each post
-      req.body.forEach((post, index) => {
-        const { error } = validatePost(post);
-        if (error) {
-          return next(
-            new AppError(`Post at index ${index}: ${error.message}`, 400)
-          );
-        }
-      });
-
       // Create all posts in a single operation
-      const posts = await Post.insertMany(req.body, {
+      const posts = await PostModel.insertMany(parseRes.data, {
         ordered: false, // Continues inserting even if there are errors
         rawResult: false, // Returns the documents instead of raw result
       });

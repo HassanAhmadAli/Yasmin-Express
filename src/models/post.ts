@@ -1,8 +1,8 @@
 import Joi, { ref } from "joi";
 import mongoose from "mongoose";
 import Customer from "./customer.js";
-
-const PostSchema = new mongoose.Schema({
+import { z } from "zod/v4";
+const PostMongooseSchema = new mongoose.Schema({
   customer: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
@@ -12,25 +12,14 @@ const PostSchema = new mongoose.Schema({
   title: { type: String, required: true },
   body: { type: String, required: true },
 });
-const PostJoiSchema = Joi.object({
-  customer: Joi.string().required(),
-  title: Joi.string().required(),
-  body: Joi.string().required(),
+export const PostInputSchema = z.object({
+  customer: z.string(),
+  title: z.string(),
+  body: z.string(),
 });
-export function validatePost(post: unknown) {
-  return PostJoiSchema.validate(post);
-}
-const PostUpdateJoiSchema = Joi.object({
-  customer: Joi.string().optional(),
-  title: Joi.string().optional(),
-  body: Joi.string().optional(),
-});
-export function validateUpdatePost(post: unknown) {
-  return PostUpdateJoiSchema.validate(post);
-}
+export const BulkPostInputSchema = z.array(PostInputSchema);
 
-export type PostSchemaType = mongoose.InferSchemaType<typeof PostSchema>;
+export interface PostDoc
+  extends mongoose.InferSchemaType<typeof PostMongooseSchema> {}
 
-export interface IPostSchema extends mongoose.Document, PostSchemaType {}
-
-export const Post = mongoose.model<IPostSchema>("Post", PostSchema);
+export const PostModel = mongoose.model<PostDoc>("Post", PostMongooseSchema);
