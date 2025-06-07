@@ -3,3 +3,5 @@ out/
 !.gitignore
 out/!.gitignore
 out/app.js
+pnpm-lock.yaml
+pnpm-workspace.yaml
