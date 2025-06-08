@@ -1,4 +1,4 @@
-import SocketIo from "socket.io";
+import * as SocketIo from "socket.io";
 import http from "node:http";
 
 export const createSocketIosServer = (server: http.Server) => {
