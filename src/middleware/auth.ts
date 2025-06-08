@@ -6,7 +6,11 @@ import _ from "lodash";
 interface AuthRequest extends Request {
   user?: any;
 }
-const auth = async (req: AuthRequest, res: Response, next: NextFunction) => {
+const authMiddleware = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+) => {
   const authorizationHeader = req.header("authorization");
   if (!authorizationHeader?.startsWith("Bearer ")) {
     next(new AppError("Access Denied. No token provided.", 401));
@@ -24,4 +28,4 @@ const auth = async (req: AuthRequest, res: Response, next: NextFunction) => {
   }
 };
 
-export default auth;
+export { authMiddleware };

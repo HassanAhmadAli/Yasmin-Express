@@ -6,7 +6,7 @@ import {
   PostBulkInputSchema,
 } from "../models/post.js";
 import { AppError } from "../utils/errors.js";
-import authMiddleware from "../middleware/auth.js";
+import {authMiddleware} from "../middleware/auth.js";
 import { z, ZodError } from "../lib/zod.js";
 export const PostRouter: Router = express.Router();
 

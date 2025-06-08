@@ -1,6 +1,6 @@
 import express, { Request, Response, NextFunction } from "express";
 import signupRoute from "./routes/signup.js";
-import errorHandler from "./middleware/errorHandler.js";
+import { errorHandler } from "./middleware/errorHandler.js";
 import authRoutes from "./routes/login.js";
 import customerRoutes from "./routes/customer.js";
 import productRoutes from "./routes/product.js";
