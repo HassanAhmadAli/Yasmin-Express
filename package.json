@@ -2,13 +2,13 @@
   "name": "cfy",
   "version": "1.0.0",
   "description": "",
-  "main": "out/app.js",
+  "main": "out/server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node out/app.js",
+    "start": "node out/server.js",
     "build": "npx tsc --watch",
-    "dev": "npx nodemon out/app.js",
-    "tsc-watch": "pnpm dlx tsc-watch --onSuccess \"node .\\out\\app.js\""
+    "dev": "npx nodemon out/server.js",
+    "tsc-watch": "pnpm dlx tsc-watch --onSuccess \"node .\\out\\server.js\""
   },
   "repository": {
     "type": "git",
