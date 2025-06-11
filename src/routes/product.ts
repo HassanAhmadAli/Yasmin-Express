@@ -1,4 +1,4 @@
-import  { Request, Response, Router, NextFunction } from "express";
+import { Request, Response, Router, NextFunction } from "express";
 import {
   ProductInputSchema,
   ProductModel,
@@ -7,7 +7,7 @@ import {
 import { AppError } from "../utils/errors.js";
 import { authMiddleware } from "../middleware/auth.js";
 import { z, ZodError } from "../lib/zod.js";
-const router: Router = express.Router();
+const router: Router = Router();
 
 router.post(
   "/",

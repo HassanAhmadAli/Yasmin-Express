@@ -5,8 +5,9 @@ import {
   comparePasswordWithHash,
 } from "../models/user.js";
 
-import { z, ZodError } from "../lib/zod.js";
 import csurf from "csurf";
+import { env } from "../utils/env.js";
+import { AppError } from "../utils/errors.js";
 const authRoutes = express.Router();
 const csrf = csurf({
   ignoreMethods: ["POST"],
