@@ -8,7 +8,7 @@ const router: Router = Router();
 router.post(
   "/",
   authMiddleware,
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response) => {
     const data = ProductInputSchema.parse(req.body);
     const product = new ProductModel(data);
     const result = await product.save();
@@ -87,7 +87,7 @@ router.post(
 );
 
 router.get("/", async (req: Request, res: Response, next: NextFunction) => {
-  const products = await ProductModel.find();
+  const products = await ProductModel.find().exec();
   res.json(products);
 });
 
@@ -104,14 +104,13 @@ router.get(
 
 // Get product by id
 router.get("/:id", async (req: Request, res: Response, next: NextFunction) => {
-  const product = await ProductModel.findById(req.params.id);
+  const product = await ProductModel.findById(req.params.id).exec();
   if (!product) {
     return next(new AppError("Product not found", 404));
   }
   res.json(product);
 });
 
-// Update product
 router.put(
   "/:id",
   authMiddleware,
@@ -120,7 +119,7 @@ router.put(
     const product = await ProductModel.findByIdAndUpdate(req.params.id, data, {
       new: true,
       runValidators: true,
-    });
+    }).exec();
     if (!product) {
       return next(new AppError("Product not found", 404));
     }

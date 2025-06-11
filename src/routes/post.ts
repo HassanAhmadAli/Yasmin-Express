@@ -56,7 +56,7 @@ PostRouter.put(
       { _id: req.params.id },
       data,
       { new: true, runValidators: true }
-    );
+    ).exec();
     if (!post) {
       return next(new AppError("Post not found or unauthorized", 404));
     }
@@ -71,7 +71,7 @@ PostRouter.delete(
     try {
       const post = await PostModel.findOneAndDelete({
         _id: req.params.id,
-      });
+      }).exec();
       if (!post) {
         return next(new AppError("Post not found or unauthorized", 404));
       }
