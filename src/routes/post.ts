@@ -68,9 +68,10 @@ PostRouter.delete(
   "/:id",
   authMiddleware,
   async (req: Request, res: Response, next: NextFunction) => {
+    const id = req.params.id;
     try {
       const post = await PostModel.findOneAndDelete({
-        _id: req.params.id,
+        _id: id,
       }).exec();
       if (!post) {
         return next(new AppError("Post not found or unauthorized", 404));
