@@ -24,28 +24,20 @@ authRoutes.post(
   "/",
   async (req: Request, res: Response, next: NextFunction) => {
     const invalidLoginMessage = "Invalid Email Or Password";
-    try {
-      // Validate input
-      const data = LoginUserInputSchema.parse(req.body);
-      const existingUser = await UserModel.findOne({ email: data.email });
-      if (!existingUser) {
-        return next(new AppError(invalidLoginMessage, 409));
-      }
-      const validPassword = await comparePasswordWithHash(
-        data.password,
-        existingUser.password
-      );
-      if (!validPassword) {
-        return next(new AppError(invalidLoginMessage, 409));
-      }
-      const token = existingUser.getJsonWebToken();
-      res.status(200).json({ token: token, csrfToken: req.csrfToken() });
-    } catch (error: any) {
-      if (error instanceof ZodError) {
-        return next(AppError.fromZodError(error, 400));
-      }
-      next(new AppError(error.message, 500));
+    const data = LoginUserInputSchema.parse(req.body);
+    const existingUser = await UserModel.findOne({ email: data.email });
+    if (!existingUser) {
+      return next(new AppError(invalidLoginMessage, 409));
     }
+    const validPassword = await comparePasswordWithHash(
+      data.password,
+      existingUser.password
+    );
+    if (!validPassword) {
+      return next(new AppError(invalidLoginMessage, 409));
+    }
+    const token = existingUser.getJsonWebToken();
+    res.status(200).json({ token: token, csrfToken: req.csrfToken() });
   }
 );
 

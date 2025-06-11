@@ -14,17 +14,10 @@ router.post(
   "/",
   authMiddleware,
   async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const data = ProductInputSchema.parse(req.body);
-      const product = new ProductModel(data);
-      const result = await product.save();
-      res.status(201).json(result);
-    } catch (error: any) {
-      if (error instanceof ZodError) {
-        return next(AppError.fromZodError(error, 400));
-      }
-      next(new AppError(error.message, 500));
-    }
+    const data = ProductInputSchema.parse(req.body);
+    const product = new ProductModel(data);
+    const result = await product.save();
+    res.status(201).json(result);
   }
 );
 
