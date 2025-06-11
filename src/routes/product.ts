@@ -2,7 +2,7 @@ import { Request, Response, Router, NextFunction } from "express";
 import { ProductInputSchema, ProductModel } from "../models/product.js";
 import { AppError } from "../utils/errors.js";
 import { authMiddleware } from "../middleware/auth.js";
-import { z, ZodError } from "../lib/zod.js";
+import { z, ZodError, zodStringToInteger } from "../lib/zod.js";
 const router: Router = Router();
 
 router.post("/", authMiddleware, async (req: Request, res: Response) => {
@@ -97,7 +97,7 @@ router.get("/", async (req: Request, res: Response, next: NextFunction) => {
 router.get(
   "/page/:number",
   async (req: Request, res: Response, next: NextFunction) => {
-    const number = parseInt(req.params.number);
+    const number = zodStringToInteger.parse(req.params.number);
     const products = await ProductModel.find()
       .skip((number - 1) * 10)
       .limit(10);

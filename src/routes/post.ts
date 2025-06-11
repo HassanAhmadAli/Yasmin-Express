@@ -2,7 +2,7 @@ import express, { Request, Response, Router, NextFunction } from "express";
 import { PostModel, PostInputSchema } from "../models/post.js";
 import { AppError } from "../utils/errors.js";
 import { authMiddleware } from "../middleware/auth.js";
-import { z } from "../lib/zod.js";
+import { z, zodStringToInteger } from "../lib/zod.js";
 export const PostRouter: Router = express.Router();
 
 PostRouter.post(
@@ -24,7 +24,7 @@ PostRouter.get("/", async (req: Request, res: Response, next: NextFunction) => {
 PostRouter.get(
   "/page/:number",
   async (req: Request, res: Response, next: NextFunction) => {
-    const number = parseInt(req.params.number);
+    const number = zodStringToInteger.parse(req.params.number);
     const posts = await PostModel.find()
       .populate("customer")
       .skip((number - 1) * 10)
