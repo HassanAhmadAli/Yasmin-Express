@@ -15,7 +15,6 @@ export const PostInputSchema = z.object({
   title: z.string(),
   body: z.string(),
 });
-export const PostBulkInputSchema = z.array(PostInputSchema);
 export interface PostDoc
   extends mongoose.InferSchemaType<typeof PostMongooseSchema> {}
 export const PostModel = mongoose.model<PostDoc>("Post", PostMongooseSchema);

@@ -1,12 +1,9 @@
 import express, { Request, Response, Router, NextFunction } from "express";
-import {
-  CustomerModel,
-  CustomerInputSchema,
-  CustomerBulkInputSchema,
-} from "../models/customer.js";
+import { CustomerModel, CustomerInputSchema } from "../models/customer.js";
 import { AppError } from "../utils/errors.js";
 import { authMiddleware } from "../middleware/auth.js";
 import mongoose from "mongoose";
+import { z } from "../lib/zod.js";
 const router: Router = express.Router();
 
 router.post(
@@ -122,7 +119,7 @@ router.post(
   "/bulk",
   authMiddleware,
   async (req: Request, res: Response, next: NextFunction) => {
-    const data = CustomerBulkInputSchema.parse(req.body);
+    const data = z.array(CustomerInputSchema).parse(req.body);
     const products = await CustomerModel.insertMany(data, {
       ordered: false,
       rawResult: false,

@@ -38,7 +38,6 @@ export const ProductInputSchema = z.object({
     count: z.number().min(0),
   }),
 });
-export const ProductBulkInputSchema = z.array(ProductInputSchema);
 
 export const ProductModel = mongoose.model("Product", productMongooseSchema);
 export { CategoryEnum as Category };

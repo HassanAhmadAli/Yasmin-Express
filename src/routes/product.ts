@@ -1,9 +1,5 @@
 import { Request, Response, Router, NextFunction } from "express";
-import {
-  ProductInputSchema,
-  ProductModel,
-  ProductBulkInputSchema,
-} from "../models/product.js";
+import { ProductInputSchema, ProductModel } from "../models/product.js";
 import { AppError } from "../utils/errors.js";
 import { authMiddleware } from "../middleware/auth.js";
 import { z, ZodError } from "../lib/zod.js";
@@ -77,7 +73,7 @@ router.post(
         new AppError("Request body must be an array of products", 400)
       );
     }
-    const data = ProductBulkInputSchema.parse(req.body);
+    const data = z.array(ProductInputSchema).parse(req.body);
     const products = await ProductModel.insertMany(data, {
       ordered: false,
       rawResult: false,

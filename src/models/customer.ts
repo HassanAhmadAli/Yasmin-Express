@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import { parsePhoneNumberFromString } from "libphonenumber-js";
-import { z } from "../lib/zod.js";
+import { z, zodWebsiteValidator } from "../lib/zod.js";
 import { addressInputSchema, addressMongooseSchema } from "./address.js";
 import { companyInputSchema, companyMongooseSchema } from "./company.js";
 export const customerMongooseSchema = new mongoose.Schema({
@@ -27,13 +27,7 @@ export const CustomerInputSchema = z.object({
     }
     return phoneNumber.format("E.164");
   }),
-  website: z
-    .string()
-    .regex(
-      /^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/\S*)?$/,
-      "invalid Url"
-    ),
+  website: zodWebsiteValidator,
   company: companyInputSchema,
 });
-export const CustomerBulkInputSchema = z.array(CustomerInputSchema);
 export const CustomerModel = mongoose.model("customer", customerMongooseSchema);
