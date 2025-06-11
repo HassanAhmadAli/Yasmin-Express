@@ -27,38 +27,42 @@ router.post(
   }
 );
 
+const SearchRequestInput = z.object({
+  term: z
+    .string()
+    .trim()
+    .min(1)
+    .transform((arg) => {
+      return new RegExp(arg, "i");
+    }),
+  type: z
+    .enum(["name", "email", "address", "username", "any"])
+    .nullish()
+    .transform((arg) => {
+      if (!arg) return "any";
+      return arg;
+    }),
+});
 router.post(
   "/search",
   async (req: Request, res: Response, next: NextFunction) => {
-    if (!req.body || !(typeof req.body.term === "string")) {
-      return next(
-        new AppError("Search term is required and must be a string", 400)
-      );
-    }
-    const { term, type } = req.body;
-    if (term.trim().length === 0) {
-      return next(new AppError("Search term cannot be empty", 400));
-    }
-    const searchRegex = new RegExp(term, "i");
-    if (!type) {
+    const data = SearchRequestInput.parse(req.body);
+    if (data.type === "any") {
       const customers = await CustomerModel.find({
         $or: [
-          { name: searchRegex },
-          { email: searchRegex },
-          { address: searchRegex },
-          { username: searchRegex },
+          { name: data.term },
+          { email: data.term },
+          { address: data.term },
+          { username: data.term },
         ],
       });
       res.json(customers);
       return;
-    } else {
-      const searchTypeRegex = new RegExp(term, "i");
-      const customers = await CustomerModel.find({
-        [type]: searchTypeRegex,
-      });
-      res.json(customers);
-      return;
     }
+    const customers = await CustomerModel.find({
+      [data.type]: data.term,
+    });
+    res.json(customers);
   }
 );
 
@@ -70,7 +74,7 @@ router.get("/", async (req: Request, res: Response, next: NextFunction) => {
 router.get(
   "/page/:number",
   async (req: Request, res: Response, next: NextFunction) => {
-    const number: any = req.params.number;
+    const number = z.number().parse(req.params.number);
     const customers = await CustomerModel.find()
       .skip((number - 1) * 7)
       .limit(7);
