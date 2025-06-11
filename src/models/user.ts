@@ -17,7 +17,6 @@ export interface UserDoc extends InferSchemaType<typeof UserMongooseSchema> {
 }
 
 UserMongooseSchema.methods.getJsonWebToken = function (): string {
-  const payLoad = _.pick(this, ["_id"]);
   const jwt_secret: any = env.jwtPrivateKey;
   const token = jsonwebtoken.sign(_.pick(this, "_id"), jwt_secret);
   return token;
