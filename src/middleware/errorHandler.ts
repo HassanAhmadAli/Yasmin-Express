@@ -1,22 +1,28 @@
-import express, { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction } from "express";
 import { AppError } from "../utils/errors.js";
+import { z, prettifyError, ZodError } from "../lib/zod.js";
+
 export const errorHandler = (
-  err: Error | AppError,
+  error: Error | AppError,
   req: Request,
   res: any,
   next: NextFunction
 ) => {
-  if (err instanceof AppError) {
-    return res.status(err.statusCode).json({
-      status: err.status,
-      message: err.message,
+  if (error instanceof ZodError) {
+    return res.status(400).json({
+      status: "fail",
+      message: z.prettifyError(error),
     });
   }
-
-  // Handle unexpected errors
-  console.error("Unhandled error:", err);
+  if (error instanceof AppError) {
+    return res.status(error.statusCode).json({
+      status: error.status,
+      message: error.message,
+    });
+  }
+  console.error("Unhandled error:", error);
   return res.status(500).json({
     status: "error",
-    message: err.message || "Something went wrong",
+    message: error.message || "Something went wrong",
   });
 };

@@ -9,7 +9,6 @@ const app: Router = express.Router();
 app.post("/", async (req: Request, res: Response, next: NextFunction) => {
   try {
     const data = UserInputSchema.parse(req.body);
-    const existingUser = await UserModel.findOne({ email: data.email });
     const user = new UserModel({
       ..._.omit(data, ["password"]),
       password: await hashPassword(data.password),

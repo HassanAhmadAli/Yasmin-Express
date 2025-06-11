@@ -19,5 +19,8 @@
     "**/.turbo/**",
     "**/.vscode/**",
     "**/static/**"
-  ]
+  ],
+  "execMap": {
+    "ts": "tsx"
+  }
 }

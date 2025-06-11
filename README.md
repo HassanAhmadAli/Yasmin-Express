@@ -4,11 +4,7 @@
 ```shell
 npm install
 ```
-2. build the project
-```shell
-npm run build
-```
-3. Run the project
+2. Run the project
 ```
 npm run start
 ```
