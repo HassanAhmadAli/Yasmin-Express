@@ -31,7 +31,7 @@ const SearchRequestInput = z.object({
   term: z
     .string()
     .trim()
-    .min(1)
+    .nonempty()
     .transform((arg) => {
       return new RegExp(arg, "i");
     }),
