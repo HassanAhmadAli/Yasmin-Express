@@ -13,12 +13,13 @@ app.post("/", async (req: Request, res: Response, next: NextFunction) => {
   try {
     await user.save();
   } catch (error: any) {
-    if (error instanceof mongoose.mongo.MongoServerError) {
-      if (error.code === 11000) {
-        return next(new AppError("User already exists", 409));
-      }
-      return next(error);
+    if (
+      error instanceof mongoose.mongo.MongoServerError &&
+      error.code === 11000
+    ) {
+      return next(new AppError("User already exists", 409));
     }
+    return next(error);
   }
   const token = user.getJsonWebToken();
   res.header("x-auth-token", token).status(201).json({ token: token });

@@ -10,7 +10,6 @@ import {authMiddleware} from "../middleware/auth.js";
 import { z, ZodError } from "../lib/zod.js";
 export const PostRouter: Router = express.Router();
 
-// Create new post
 PostRouter.post(
   "/",
   authMiddleware,
@@ -29,7 +28,6 @@ PostRouter.post(
   }
 );
 
-// Get all posts
 PostRouter.get("/", async (req: Request, res: Response, next: NextFunction) => {
   try {
     const posts = await PostModel.find().populate("customer").exec();
@@ -39,7 +37,6 @@ PostRouter.get("/", async (req: Request, res: Response, next: NextFunction) => {
   }
 });
 
-// Get posts with pagination
 PostRouter.get(
   "/page/:number",
   async (req: Request, res: Response, next: NextFunction) => {
@@ -57,7 +54,6 @@ PostRouter.get(
   }
 );
 
-// Get post by id
 PostRouter.get(
   "/:id",
   async (req: Request, res: Response, next: NextFunction) => {
@@ -75,7 +71,6 @@ PostRouter.get(
   }
 );
 
-// Update post
 PostRouter.put(
   "/:id",
   authMiddleware,
@@ -101,7 +96,6 @@ PostRouter.put(
   }
 );
 
-// Delete post
 PostRouter.delete(
   "/:id",
   authMiddleware,
@@ -121,7 +115,6 @@ PostRouter.delete(
   }
 );
 
-// Bulk create posts
 PostRouter.post(
   "/bulk",
   authMiddleware,

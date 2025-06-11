@@ -1,4 +1,4 @@
-import express, { Request, Response, Router, NextFunction } from "express";
+import  { Request, Response, Router, NextFunction } from "express";
 import {
   ProductInputSchema,
   ProductModel,
@@ -9,7 +9,6 @@ import { authMiddleware } from "../middleware/auth.js";
 import { z, ZodError } from "../lib/zod.js";
 const router: Router = express.Router();
 
-// Create new product
 router.post(
   "/",
   authMiddleware,
@@ -79,7 +78,6 @@ router.post(
       );
     }
     const data = ProductBulkInputSchema.parse(req.body);
-
     const products = await ProductModel.insertMany(data, {
       ordered: false,
       rawResult: false,
