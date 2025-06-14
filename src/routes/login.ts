@@ -8,6 +8,7 @@ import {
 import csurf from "csurf";
 import { env } from "../utils/env.js";
 import { AppError } from "../utils/errors.js";
+import _ from "lodash";
 const authRoutes = express.Router();
 const csrf = csurf({
   ignoreMethods: ["POST"],
@@ -22,19 +23,21 @@ authRoutes.post(
   async (req: Request, res: Response, next: NextFunction) => {
     const invalidLoginMessage = "Invalid Email Or Password";
     const data = LoginUserInputSchema.parse(req.body);
-    const existingUser = await UserModel.findOne({ email: data.email });
-    if (!existingUser) {
+    const user = await UserModel.findOne({ email: data.email });
+    if (!user) {
       return next(new AppError(invalidLoginMessage, 409));
     }
     const validPassword = await comparePasswordWithHash(
       data.password,
-      existingUser.password
+      user.password
     );
     if (!validPassword) {
       return next(new AppError(invalidLoginMessage, 409));
     }
-    const token = existingUser.getJsonWebToken();
-    res.status(200).json({ token: token, csrfToken: req.csrfToken() });
+    const token = user.getJsonWebToken();
+    res.status(200).json({
+      token: token, csrfToken: req.csrfToken(), user: _.pick(user, ["name", "email", "_id"])
+    });
   }
 );
 

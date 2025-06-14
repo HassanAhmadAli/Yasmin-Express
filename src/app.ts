@@ -17,9 +17,9 @@ const corsOptions = {
   origin: /^.*/,
 };
 app.use(cors(corsOptions));
-// app.use(async (req, res, next) => {
-//   setTimeout(next, 1);
-// });
+app.use(async (req, res, next) => {
+  setTimeout(next, 0);
+});
 app.use(morgan("tiny"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
