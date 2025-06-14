@@ -100,3 +100,36 @@ PostRouter.post(
     });
   }
 );
+
+const SearchRequestInput = z.object({
+  term: z
+    .string()
+    .trim()
+    .nonempty()
+    .transform((arg) => {
+      return new RegExp(arg, "i");
+    }),
+});
+PostRouter.post(
+  "/search",
+  async (req: Request, res: Response, next: NextFunction) => {
+    const data = SearchRequestInput.parse(req.body);
+    const posts = await PostModel.find({
+      title: data.term
+    }).populate("customer").exec();
+    res.json(posts);
+  }
+);
+
+const getBulkInput = z.object({
+  id: z.array(z.string())
+})
+
+PostRouter.post(
+  "/getByIdBulk",
+  async (req: Request, res: Response, next: NextFunction) => {
+    const data = getBulkInput.parse(req.body);
+    const posts = await PostModel.find({ _id: { $in: data.id } }).populate("customer").exec();
+    res.json(posts);
+  }
+);

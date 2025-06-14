@@ -3,7 +3,12 @@ dotenv.config({});
 import { z, prettifyError } from "../lib/zod.js";
 const envSchema = z
   .object({
-    MONGODB_URI: z.string().default("mongodb://localhost:27017"),
+    MONGODB_URI: z.string().default("mongodb://localhost:27017").transform((arg) => {
+      if (process.env.NODE_ENV === "development")
+        return "mongodb://localhost:27017";
+      return arg;
+
+    }),
     jwtPrivateKey: z
       .string()
       .default(
